@@ -1,0 +1,117 @@
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Scanner;
+
+class Process {
+    int id;
+    int arrivalTime;
+    int burstTime;
+    int remainingTime;
+    int waitingTime;
+    int turnaroundTime;
+    int completionTime;
+    int startTime;
+
+    public Process(int id, int arrivalTime, int burstTime) {
+        this.id = id;
+        this.arrivalTime = arrivalTime;
+        this.burstTime = burstTime;
+        this.remainingTime = burstTime;
+        this.waitingTime = 0;
+        this.turnaroundTime = 0;
+        this.completionTime = 0;
+        this.startTime = -1;
+    }
+}
+
+public class SRTFScheduler {
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Input number of processes
+        System.out.print("Enter the number of processes: ");
+        int n = scanner.nextInt();
+
+        ArrayList<Process> processes = new ArrayList<>();
+
+        // Input arrival time and burst time for each process
+        for (int i = 0; i < n; i++) {
+            System.out.print("Enter arrival time for Process " + (i + 1) + ": ");
+            int arrivalTime = scanner.nextInt();
+            System.out.print("Enter burst time for Process " + (i + 1) + ": ");
+            int burstTime = scanner.nextInt();
+            processes.add(new Process(i + 1, arrivalTime, burstTime));
+        }
+
+        // Sort processes by arrival time initially
+        Collections.sort(processes, (p1, p2) -> p1.arrivalTime - p2.arrivalTime);
+
+        int currentTime = 0;
+        int completedProcesses = 0;
+        ArrayList<Process> readyQueue = new ArrayList<>();
+
+        // SRTF scheduling algorithm
+        while (completedProcesses < n) {
+            // Add all processes that have arrived by the current time
+            for (Process process : processes) {
+                if (process.arrivalTime <= currentTime && !readyQueue.contains(process)) {
+                    readyQueue.add(process);
+                }
+            }
+
+            // If readyQueue is empty, increment currentTime (no process is ready)
+            if (readyQueue.isEmpty()) {
+                currentTime++;
+                continue;
+            }
+
+            // Find the process with the shortest remaining time
+            Process shortestJob = readyQueue.get(0);
+            for (Process process : readyQueue) {
+                if (process.remainingTime < shortestJob.remainingTime) {
+                    shortestJob = process;
+                }
+            }
+
+            // Execute the selected process for 1 unit of time
+            if (shortestJob.startTime == -1) {
+                shortestJob.startTime = currentTime; // Process starts at the current time
+            }
+            shortestJob.remainingTime--;
+
+            // If the process is finished, update its completion time and remove from readyQueue
+            if (shortestJob.remainingTime == 0) {
+                shortestJob.completionTime = currentTime + 1;
+                shortestJob.turnaroundTime = shortestJob.completionTime - shortestJob.arrivalTime;
+                shortestJob.waitingTime = shortestJob.turnaroundTime - shortestJob.burstTime;
+                completedProcesses++;
+                readyQueue.remove(shortestJob);
+            }
+
+            // Increment the current time
+            currentTime++;
+        }
+
+        // Display results
+        System.out.println("\nProcess\tArrival Time\tBurst Time\tWaiting Time\tTurnaround Time\tCompletion Time");
+        for (Process process : processes) {
+            System.out.println("P" + process.id + "\t\t" + process.arrivalTime + "\t\t" +
+                    process.burstTime + "\t\t" + process.waitingTime + "\t\t" +
+                    process.turnaroundTime + "\t\t" + process.completionTime);
+        }
+
+        // Calculate average waiting time and turnaround time
+        double totalWaitingTime = 0;
+        double totalTurnaroundTime = 0;
+        for (Process process : processes) {
+            totalWaitingTime += process.waitingTime;
+            totalTurnaroundTime += process.turnaroundTime;
+        }
+
+        System.out.println("\nAverage Waiting Time: " + (totalWaitingTime / n));
+        System.out.println("Average Turnaround Time: " + (totalTurnaroundTime / n));
+
+        scanner.close();
+    }
+}
