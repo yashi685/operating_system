@@ -1,0 +1,77 @@
+a) Shell Program to Check Whether a Number is Even or Odd
+#!/bin/bash
+
+echo "Enter a number:"
+read num
+
+if (( num % 2 == 0 )); then
+    echo "$num is even."
+else
+    echo "$num is odd."
+fi
+
+b) Shell Program to Check Whether a Number is Prime or Not
+#!/bin/bash
+
+echo "Enter a number:"
+read num
+
+if [ "$num" -le 1 ]; then
+    echo "$num is not a prime number."
+    exit
+fi
+
+is_prime=1
+for (( i=2; i*i<=num; i++ ))
+do
+    if (( num % i == 0 )); then
+        is_prime=0
+        break
+    fi
+done
+
+if (( is_prime )); then
+    echo "$num is a prime number."
+else
+    echo "$num is not a prime number."
+fi
+
+c) Shell Program to Check Whether a Number is a Palindrome
+#!/bin/bash
+
+echo "Enter a number:"
+read num
+
+original_num=$num
+reverse=0
+
+while [ "$num" -gt 0 ]
+do
+    remainder=$(( num % 10 ))
+    reverse=$(( reverse * 10 + remainder ))
+    num=$(( num / 10 ))
+done
+
+if [ "$original_num" -eq "$reverse" ]; then
+    echo "$original_num is a palindrome."
+else
+    echo "$original_num is not a palindrome."
+fi
+
+d) Shell Program to Display Day of the Week Based on Number (1 to 7)
+#!/bin/bash
+
+echo "Enter a number (1 to 7) to get the corresponding day of the week:"
+read day_num
+
+case $day_num in
+    1) echo "Sunday" ;;
+    2) echo "Monday" ;;
+    3) echo "Tuesday" ;;
+    4) echo "Wednesday" ;;
+    5) echo "Thursday" ;;
+    6) echo "Friday" ;;
+    7) echo "Saturday" ;;
+    *) echo "Invalid input! Please enter a number between 1 and 7." ;;
+esac
+
