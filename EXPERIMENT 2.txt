@@ -1,0 +1,56 @@
+a) Hello World Program
+#!/bin/bash
+echo "Hello, World!"
+
+b) Program to Find the Factorial of a Number
+#!/bin/bash
+
+echo "Enter a number:"
+read num
+factorial=1
+
+if [ $num -lt 0 ]; then
+    echo "Factorial is not defined for negative numbers."
+else
+    for (( i=1; i<=num; i++ ))
+    do
+        factorial=$((factorial * i))
+    done
+    echo "Factorial of $num is $factorial"
+fi
+
+
+c) Program to Find Gross Salary of an Employee
+#!/bin/bash
+
+echo "Enter basic salary:"
+read basic_salary
+
+da=$(echo "$basic_salary * 0.10" | bc) # 10% of basic salary
+hra=$(echo "$basic_salary * 0.20" | bc) # 20% of basic salary
+gross_salary=$(echo "$basic_salary + $da + $hra" | bc)
+
+echo "Gross Salary is: $gross_salary"
+
+d) Program to Display a Menu and Execute Instructions According
+#!/bin/bash
+
+while true; do
+    echo "Select an option:"
+    echo "1) List of files"
+    echo "2) Process status"
+    echo "3) Date"
+    echo "4) Users logged in"
+    echo "5) Quit"
+    echo -n "Enter your choice: "
+    read choice
+
+    case $choice in
+        1) ls ;;
+        2) ps ;;
+        3) date ;;
+        4) who ;;
+        5) echo "Exiting..."; exit ;;
+        *) echo "Invalid option, please try again." ;;
+    esac
+done
