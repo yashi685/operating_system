@@ -1,0 +1,112 @@
+import java.util.Scanner;
+
+public class BankersAlgorithm {
+    
+    private static final int NUM_PROCESSES = 5;
+    private static final int NUM_RESOURCES = 3;
+
+    private static int[][] allocation = new int[NUM_PROCESSES][NUM_RESOURCES];
+    private static int[][] maximum = new int[NUM_PROCESSES][NUM_RESOURCES];
+    private static int[][] need = new int[NUM_PROCESSES][NUM_RESOURCES];
+    private static int[] available = new int[NUM_RESOURCES];
+
+    // Function to calculate the "Need" matrix
+    private static void calculateNeed() {
+        for (int i = 0; i < NUM_PROCESSES; i++) {
+            for (int j = 0; j < NUM_RESOURCES; j++) {
+                need[i][j] = maximum[i][j] - allocation[i][j];
+            }
+        }
+    }
+
+    // Function to check if a process can finish
+    private static boolean canFinish(int process, boolean[] finish) {
+        for (int i = 0; i < NUM_RESOURCES; i++) {
+            if (need[process][i] > available[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Function to implement Banker's Algorithm for deadlock avoidance
+    private static boolean isSafe() {
+        boolean[] finish = new boolean[NUM_PROCESSES];
+        int[] work = new int[NUM_RESOURCES];
+        for (int i = 0; i < NUM_RESOURCES; i++) {
+            work[i] = available[i];
+        }
+
+        int count = 0;
+        while (count < NUM_PROCESSES) {
+            boolean found = false;
+            for (int i = 0; i < NUM_PROCESSES; i++) {
+                if (!finish[i] && canFinish(i, finish)) {
+                    // Add allocated resources to work
+                    for (int j = 0; j < NUM_RESOURCES; j++) {
+                        work[j] += allocation[i][j];
+                    }
+                    finish[i] = true;
+                    found = true;
+                    count++;
+                    System.out.println("Process " + i + " has finished.");
+                    break;
+                }
+            }
+
+            // If no process can finish, return false indicating deadlock
+            if (!found) {
+                System.out.println("Deadlock detected! No safe sequence.");
+                return false;
+            }
+        }
+
+        System.out.println("System is in a safe state.");
+        return true;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        // Input Available Resources
+        System.out.println("Enter the available resources for each type:");
+        for (int i = 0; i < NUM_RESOURCES; i++) {
+            available[i] = sc.nextInt();
+        }
+
+        // Input Maximum Matrix
+        System.out.println("Enter the maximum demand for each process:");
+        for (int i = 0; i < NUM_PROCESSES; i++) {
+            System.out.println("For Process " + i + ":");
+            for (int j = 0; j < NUM_RESOURCES; j++) {
+                maximum[i][j] = sc.nextInt();
+            }
+        }
+
+        // Input Allocation Matrix
+        System.out.println("Enter the allocated resources for each process:");
+        for (int i = 0; i < NUM_PROCESSES; i++) {
+            System.out.println("For Process " + i + ":");
+            for (int j = 0; j < NUM_RESOURCES; j++) {
+                allocation[i][j] = sc.nextInt();
+            }
+        }
+
+        // Calculate the Need matrix
+        calculateNeed();
+
+        // Displaying the Need matrix
+        System.out.println("\nNeed Matrix:");
+        for (int i = 0; i < NUM_PROCESSES; i++) {
+            for (int j = 0; j < NUM_RESOURCES; j++) {
+                System.out.print(need[i][j] + " ");
+            }
+            System.out.println();
+        }
+
+        // Check if the system is in a safe state
+        isSafe();
+
+        sc.close();
+    }
+}
