@@ -1,0 +1,109 @@
+import java.util.*;
+
+public class PageReplacement {
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        // Input: Reference String
+        System.out.println("Enter the number of pages in the reference string:");
+        int n = sc.nextInt();
+        int[] referenceString = new int[n];
+        System.out.println("Enter the reference string:");
+        for (int i = 0; i < n; i++) {
+            referenceString[i] = sc.nextInt();
+        }
+
+        // Input: Number of Frames
+        System.out.println("Enter the number of frames:");
+        int frames = sc.nextInt();
+
+        // Run all three algorithms
+        System.out.println("\n--- Page Replacement Policies ---");
+        fifo(referenceString, frames);
+        lru(referenceString, frames);
+        optimal(referenceString, frames);
+
+        sc.close();
+    }
+
+    // FIFO Page Replacement
+    public static void fifo(int[] refString, int frames) {
+        Queue<Integer> queue = new LinkedList<>();
+        Set<Integer> set = new HashSet<>();
+        int pageFaults = 0;
+
+        System.out.println("\nFIFO Page Replacement:");
+        for (int page : refString) {
+            if (!set.contains(page)) {
+                pageFaults++;
+                if (queue.size() == frames) {
+                    int removed = queue.poll();
+                    set.remove(removed);
+                }
+                queue.add(page);
+                set.add(page);
+            }
+            System.out.println("Frames: " + queue);
+        }
+        System.out.println("Total Page Faults (FIFO): " + pageFaults);
+    }
+
+    // LRU Page Replacement
+    public static void lru(int[] refString, int frames) {
+        List<Integer> list = new ArrayList<>();
+        int pageFaults = 0;
+
+        System.out.println("\nLRU Page Replacement:");
+        for (int page : refString) {
+            if (!list.contains(page)) {
+                pageFaults++;
+                if (list.size() == frames) {
+                    list.remove(0);  // Remove least recently used page
+                }
+            } else {
+                list.remove((Integer) page);  // Remove page to update its position
+            }
+            list.add(page);  // Add page to the end
+            System.out.println("Frames: " + list);
+        }
+        System.out.println("Total Page Faults (LRU): " + pageFaults);
+    }
+
+    // Optimal Page Replacement
+    public static void optimal(int[] refString, int frames) {
+        List<Integer> list = new ArrayList<>();
+        int pageFaults = 0;
+
+        System.out.println("\nOptimal Page Replacement:");
+        for (int i = 0; i < refString.length; i++) {
+            int page = refString[i];
+            if (!list.contains(page)) {
+                pageFaults++;
+                if (list.size() == frames) {
+                    // Find the page to replace
+                    int farthest = -1, indexToReplace = -1;
+                    for (int j = 0; j < list.size(); j++) {
+                        int nextUse = Integer.MAX_VALUE;
+                        for (int k = i + 1; k < refString.length; k++) {
+                            if (list.get(j) == refString[k]) {
+                                nextUse = k;
+                                break;
+                            }
+                        }
+                        if (nextUse > farthest) {
+                            farthest = nextUse;
+                            indexToReplace = j;
+                        }
+                    }
+                    list.remove(indexToReplace);  // Remove the page that won't be used for the longest time
+                }
+            } else {
+                continue;
+            }
+            list.add(page);  // Add the current page
+            System.out.println("Frames: " + list);
+        }
+        System.out.println("Total Page Faults (Optimal): " + pageFaults);
+    }
+}
